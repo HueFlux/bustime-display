@@ -1,0 +1,188 @@
+{
+  "Siri": {
+    "ServiceDelivery": {
+      "ResponseTimestamp": "2019-11-19T13:45:48.200-05:00",
+      "StopMonitoringDelivery": [
+        {
+          "MonitoredStopVisit": [
+            {
+              "MonitoredVehicleJourney": {
+                "LineRef": "MTABC_Q39",
+                "DirectionRef": "1",
+                "FramedVehicleJourneyRef": {
+                  "DataFrameRef": "2019-11-19",
+                  "DatedVehicleJourneyRef": "MTABC_25190794-LGPD9-LG_D9-Weekday-10"
+                },
+                "JourneyPatternRef": "MTA_Q390156",
+                "PublishedLineName": "Q39",
+                "OperatorRef": "MTABC",
+                "OriginRef": "MTA_551420",
+                "DestinationRef": "MTA_982168",
+                "DestinationName": "LI CITY QUEENS PLZ",
+                "SituationRef": [],
+                "Monitored": true,
+                "VehicleLocation": {
+                  "Longitude": -73.909498,
+                  "Latitude": 40.725635
+                },
+                "Bearing": 38.557728,
+                "ProgressRate": "normalProgress",
+                "BlockRef": "MTABC_LGPD9-LG_D9-Weekday-10_4831324",
+                "VehicleRef": "MTABC_7474",
+                "MonitoredCall": {
+                  "ExpectedArrivalTime": "2019-11-19T13:53:16.208-05:00",
+                  "ExpectedDepartureTime": "2019-11-19T13:53:16.208-05:00",
+                  "Extensions": {
+                    "Distances": {
+                      "StopsFromCall": 5,
+                      "CallDistanceAlongRoute": 7332.19,
+                      "DistanceFromCall": 2310.1,
+                      "PresentableDistance": "1.4 miles away"
+                    }
+                  },
+                  "StopPointRef": "MTA_503991",
+                  "VisitNumber": 1,
+                  "StopPointName": "48 ST/BKLYN-QUEENS EXPWY"
+                },
+                "OnwardCalls": {}
+              },
+              "RecordedAtTime": "2019-11-19T13:45:28.000-05:00"
+            },
+            {
+              "MonitoredVehicleJourney": {
+                "LineRef": "MTABC_Q39",
+                "DirectionRef": "1",
+                "FramedVehicleJourneyRef": {
+                  "DataFrameRef": "2019-11-19",
+                  "DatedVehicleJourneyRef": "MTABC_25190795-LGPD9-LG_D9-Weekday-10"
+                },
+                "JourneyPatternRef": "MTA_Q390156",
+                "PublishedLineName": "Q39",
+                "OperatorRef": "MTABC",
+                "OriginRef": "MTA_551420",
+                "DestinationRef": "MTA_982168",
+                "DestinationName": "LI CITY QUEENS PLZ",
+                "SituationRef": [],
+                "Monitored": true,
+                "VehicleLocation": {
+                  "Longitude": -73.904416,
+                  "Latitude": 40.709285
+                },
+                "Bearing": 116.91125,
+                "ProgressRate": "normalProgress",
+                "BlockRef": "MTABC_LGPD9-LG_D9-Weekday-10_4831452",
+                "VehicleRef": "MTABC_3724",
+                "MonitoredCall": {
+                  "ExpectedArrivalTime": "2019-11-19T14:08:23.562-05:00",
+                  "ExpectedDepartureTime": "2019-11-19T14:08:23.562-05:00",
+                  "Extensions": {
+                    "Distances": {
+                      "StopsFromCall": 19,
+                      "CallDistanceAlongRoute": 7332.19,
+                      "DistanceFromCall": 5572.83,
+                      "PresentableDistance": "3.5 miles away"
+                    }
+                  },
+                  "StopPointRef": "MTA_503991",
+                  "VisitNumber": 1,
+                  "StopPointName": "48 ST/BKLYN-QUEENS EXPWY"
+                },
+                "OnwardCalls": {}
+              },
+              "RecordedAtTime": "2019-11-19T13:45:43.000-05:00"
+            },
+            {
+              "MonitoredVehicleJourney": {
+                "LineRef": "MTABC_Q39",
+                "DirectionRef": "1",
+                "FramedVehicleJourneyRef": {
+                  "DataFrameRef": "2019-11-19",
+                  "DatedVehicleJourneyRef": "MTABC_25190796-LGPD9-LG_D9-Weekday-10"
+                },
+                "JourneyPatternRef": "MTA_Q390156",
+                "PublishedLineName": "Q39",
+                "OperatorRef": "MTABC",
+                "OriginRef": "MTA_551420",
+                "DestinationRef": "MTA_982168",
+                "DestinationName": "LI CITY QUEENS PLZ",
+                "OriginAimedDepartureTime": "2019-11-19T13:58:00.000-05:00",
+                "SituationRef": [],
+                "Monitored": true,
+                "VehicleLocation": {
+                  "Longitude": -73.905045,
+                  "Latitude": 40.710666
+                },
+                "Bearing": 292.38852,
+                "ProgressRate": "normalProgress",
+                "ProgressStatus": "prevTrip",
+                "BlockRef": "MTABC_LGPD9-LG_D9-Weekday-10_4831456",
+                "VehicleRef": "MTABC_7478",
+                "MonitoredCall": {
+                  "Extensions": {
+                    "Distances": {
+                      "StopsFromCall": 40,
+                      "CallDistanceAlongRoute": 7332.19,
+                      "DistanceFromCall": 9542.22,
+                      "PresentableDistance": "5.9 miles away"
+                    }
+                  },
+                  "StopPointRef": "MTA_503991",
+                  "VisitNumber": 1,
+                  "StopPointName": "48 ST/BKLYN-QUEENS EXPWY"
+                },
+                "OnwardCalls": {}
+              },
+              "RecordedAtTime": "2019-11-19T13:45:36.000-05:00"
+            },
+            {
+              "MonitoredVehicleJourney": {
+                "LineRef": "MTABC_Q39",
+                "DirectionRef": "1",
+                "FramedVehicleJourneyRef": {
+                  "DataFrameRef": "2019-11-19",
+                  "DatedVehicleJourneyRef": "MTABC_25190797-LGPD9-LG_D9-Weekday-10"
+                },
+                "JourneyPatternRef": "MTA_Q390156",
+                "PublishedLineName": "Q39",
+                "OperatorRef": "MTABC",
+                "OriginRef": "MTA_551420",
+                "DestinationRef": "MTA_982168",
+                "DestinationName": "LI CITY QUEENS PLZ",
+                "OriginAimedDepartureTime": "2019-11-19T14:18:00.000-05:00",
+                "SituationRef": [],
+                "Monitored": true,
+                "VehicleLocation": {
+                  "Longitude": -73.912305,
+                  "Latitude": 40.72549
+                },
+                "Bearing": 259.10535,
+                "ProgressRate": "normalProgress",
+                "ProgressStatus": "prevTrip",
+                "BlockRef": "MTABC_LGPD9-LG_D9-Weekday-10_4831459",
+                "VehicleRef": "MTABC_7467",
+                "MonitoredCall": {
+                  "Extensions": {
+                    "Distances": {
+                      "StopsFromCall": 51,
+                      "CallDistanceAlongRoute": 7332.19,
+                      "DistanceFromCall": 12481.26,
+                      "PresentableDistance": "7.8 miles away"
+                    }
+                  },
+                  "StopPointRef": "MTA_503991",
+                  "VisitNumber": 1,
+                  "StopPointName": "48 ST/BKLYN-QUEENS EXPWY"
+                },
+                "OnwardCalls": {}
+              },
+              "RecordedAtTime": "2019-11-19T13:45:24.000-05:00"
+            }
+          ],
+          "ResponseTimestamp": "2019-11-19T13:45:48.200-05:00",
+          "ValidUntil": "2019-11-19T13:46:48.200-05:00"
+        }
+      ],
+      "SituationExchangeDelivery": []
+    }
+  }
+}
