@@ -3,49 +3,108 @@ import urllib.request
 import urllib.parse
 from datetime import datetime
 from os import getenv
+from collections import namedtuple
+
+BusTime = namedtuple('BusTime', 'estimated_wait_time, stops_from_call, presentable_distance')
 
 BUSTIME_API_KEY = getenv("BUSTIME_API_KEY")
 
-params = urllib.parse.urlencode({'key' : BUSTIME_API_KEY,
-                                 'OperatorRef' : 'MTA',
-                                 'MonitoringRef' : 503991,
-                                 'LineRef' : 'MTABC_Q39'})
+def stop_monitor_data(stop_id, line_ref):
+    """
+    Gets stop monitor JSON data from the MTA Bus Time API.
 
-url = "http://bustime.mta.info/api/siri/stop-monitoring.json?%s" % params
+    Args:
+        stop_id (int): The bus stop id number.
+        line_ref (str): The bus line identifier.
 
-with urllib.request.urlopen(url) as response:
-    source = response.read()
+    Returns:
+        dict: The deserialized stop monitor JSON data
+    """
 
-data = json.loads(source)
+    params = urllib.parse.urlencode({'key' : BUSTIME_API_KEY,
+                                     'OperatorRef' : 'MTA',
+                                     'MonitoringRef' : stop_id,
+                                     'LineRef' : line_ref})
 
-with open("stop_monitor.json", 'w') as f:
-    json.dump(data, f, indent=2)
+    url = "http://bustime.mta.info/api/siri/stop-monitoring.json?%s" % params
 
-# with open("sample_stop_monitor.json", 'r') as f:
-#    data = json.load(f)
+    with urllib.request.urlopen(url) as response:
+        source = response.read()
 
-for bus in data['Siri']['ServiceDelivery']['StopMonitoringDelivery'][0]['MonitoredStopVisit']:
-    stops_from_call = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['StopsFromCall']
+    return json.loads(source)
 
-    if stops_from_call > 25:
-        continue
+def dump_json_to_file(json_data, filename):
+    with open(filename, 'w') as f:
+        json.dump(json_data, f, indent=2)
 
-    presentable_distance = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['PresentableDistance']
+def bus_times(stop_monitor_data):
+    """
+    Gets estimated wait times and distances for buses serving a stop.
 
-    expected_arrival_time = bus['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedArrivalTime')
+    Args:
+        stop_monitor_data (dict): The deserialized stop monitor JSON data.
 
-    if expected_arrival_time is not None:
+    Returns:
+        list: A list of BusTime namedtuples contaning the wait times and
+        distances for each bus.
+    """
 
-        expected_arrival_time = datetime.fromisoformat(expected_arrival_time)
-        current_time = datetime.now(expected_arrival_time.tzinfo)
-        # Get wait time in minutes
-        estimated_wait_time = (expected_arrival_time - current_time).seconds // 60
+    fixtures = []
+    for bus in stop_monitor_data['Siri']['ServiceDelivery']['StopMonitoringDelivery'][0]['MonitoredStopVisit']:
+        stops_from_call = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['StopsFromCall']
 
-        print("%d %s, %d %s away, %s" % (estimated_wait_time,
-                                         "minute" if estimated_wait_time == 1 else "minutes",
-                                         stops_from_call,
-                                         "stop" if stops_from_call == 1 else "stops",
-                                         presentable_distance))
-    else:
-        print("%d %s away" % (stops_from_call,
-                              "stop" if stops_from_call == 1 else "stops"))
+        if stops_from_call > 25:
+            continue
+
+        presentable_distance = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['PresentableDistance']
+
+        expected_arrival_time = bus['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedArrivalTime')
+
+        if expected_arrival_time is not None:
+
+            expected_arrival_time = datetime.fromisoformat(expected_arrival_time)
+            current_time = datetime.now(expected_arrival_time.tzinfo)
+            # Get wait time in minutes
+            estimated_wait_time = (expected_arrival_time - current_time).seconds // 60
+
+            fixtures.append(BusTime(estimated_wait_time, stops_from_call, presentable_distance))
+
+        else:
+            fixtures.append(BusTime(None, stops_from_call, presentable_distance))
+
+    return fixtures
+
+def print_bus_times(bus_times):
+    """
+    Prints estimated wait times and distances for buses.
+
+    Args:
+        bus_times ([BusTime]): The list of BusTime namedtuples contaning
+        the wait times and distances of each bus.
+
+    Returns:
+        None.
+    """
+
+    for bus_time in  bus_times:
+        estimated_wait_time = bus_time.estimated_wait_time
+        if estimated_wait_time is not None:
+            print("%d %s, %d %s away, %s" % (estimated_wait_time,
+                                             "minute" if estimated_wait_time == 1 else "minutes",
+                                             bus_time.stops_from_call,
+                                             "stop" if bus_time.stops_from_call == 1 else "stops",
+                                             bus_time.presentable_distance))
+        else:
+            print("%d %s away" % (bus_time.stops_from_call,
+                                  "stop" if bus_time.stops_from_call == 1 else "stops",
+                                  bus_time.presentable_distance))
+
+if __name__ == '__main__':
+    data = stop_monitor_data(503991, 'MTABC_Q39')
+    dump_json_to_file(data, 'stop_monitor.json')
+
+    # with open("sample_stop_monitor.json", 'r') as f:
+    #     data = json.load(f)
+
+    fixtures = bus_times(data)
+    print_bus_times(fixtures)
