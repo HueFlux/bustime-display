@@ -36,13 +36,10 @@ def stop_monitor_data(stop_id, line_ref=''):
 
     return json.loads(source)
 
-def dump_json_to_file(json_data, filename):
-    with open(filename, 'w') as f:
-        json.dump(json_data, f, indent=2)
-
-def bus_times(stop_monitor_data):
+def extract_bus_times(stop_monitor_data):
     """
-    Gets estimated wait times and distances for buses serving a stop.
+    Gets estimated wait times and distances for buses
+    from stop monitor JSON data.
 
     Args:
         stop_monitor_data (dict): The deserialized stop monitor JSON data.
@@ -82,6 +79,31 @@ def bus_times(stop_monitor_data):
 
     return fixtures
 
+def bus_times(stop_id, line_ref='', dump_json=False):
+    """
+    Gets estimated wait times and distances for buses serving a stop.
+
+    Args:
+        stop_id (int): The bus stop id number.
+        line_ref (str, optional): The bus line identifier.
+            Defaults to empty string.
+        dump_json (bool): Determines whether or not to dump the
+            stop monitor JSON data into a file named 'stop_monitor.json'.
+            Defaults to False.
+
+    Returns:
+        list: A list of BusTime namedtuples contaning the wait times and
+        distances for each bus.
+    """
+
+    data = stop_monitor_data(stop_id, line_ref)
+
+    if dump_json:
+        with open('stop_monitor.json', 'w') as f:
+            json.dump(data, f, indent=2)
+
+    return extract_bus_times(data)
+
 def print_bus_times(bus_times):
     """
     Prints estimated wait times and distances for buses.
@@ -112,16 +134,8 @@ def print_bus_times(bus_times):
                                                 bus_time.presentable_distance))
 
 if __name__ == '__main__':
-    data = stop_monitor_data(503991, 'MTABC_Q39')
-    dump_json_to_file(data, 'stop_monitor.json')
-
-    # with open("sample_stop_monitor.json", 'r') as f:
-    #     data = json.load(f)
-
-    fixtures = bus_times(data)
+    fixtures = bus_times(503991, 'MTABC_Q39', True)
     print_bus_times(fixtures)
 
-    data = stop_monitor_data(505168, 'MTABC_Q67')
-    dump_json_to_file(data, 'stop_monitor.json')
-    fixtures = bus_times(data)
+    fixtures = bus_times(505168, 'MTABC_Q67')
     print_bus_times(fixtures)
