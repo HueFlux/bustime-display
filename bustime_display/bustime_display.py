@@ -47,6 +47,11 @@ class BusTimeApp:
             if len(self.fixtures) > 1:
                 print(self.lower_bus_time)
 
+                # Handle case where length of fixtures decreases
+                # below lower_bus_time
+                if self.lower_bus_widget >= len(fixtures):
+                    self.lower_bus_widget = len(fixtures) - 1
+
                 self.lower_bus_widget = self.BusTimeWidget(self.lower_frame,
                     self.fixtures[self.lower_bus_time].line_name,
                     self.fixtures[self.lower_bus_time].destination_name,
