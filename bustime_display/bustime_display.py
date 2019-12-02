@@ -1,5 +1,5 @@
 import tkinter as tk
-import main as bustime
+import bustime
 from operator import attrgetter
 
 class BusTimeApp:
