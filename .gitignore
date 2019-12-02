@@ -1,1 +1,3 @@
 stop_monitor.json
+__pycache__/
+*.py[cod]

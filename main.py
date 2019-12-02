@@ -7,7 +7,7 @@ from collections import namedtuple
 
 BusTime = namedtuple('BusTime', 'line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance')
 
-BUSTIME_API_KEY = getenv("BUSTIME_API_KEY")
+BUSTIME_API_KEY = getenv('BUSTIME_API_KEY')
 
 def stop_monitor_data(stop_id, line_ref=''):
     """
@@ -74,8 +74,9 @@ def extract_bus_times(stop_monitor_data):
             fixtures.append(BusTime(line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance))
 
         else:
+            continue
             # Add BusTime to fixtures with None as estimated_wait_time
-            fixtures.append(BusTime(line_name, destination_name, None, stops_from_call, presentable_distance))
+            # fixtures.append(BusTime(line_name, destination_name, None, stops_from_call, presentable_distance))
 
     return fixtures
 
@@ -134,8 +135,8 @@ def print_bus_times(bus_times):
                                                 bus_time.presentable_distance))
 
 if __name__ == '__main__':
-    fixtures = bus_times(503991, 'MTABC_Q39', True)
-    print_bus_times(fixtures)
-
-    fixtures = bus_times(505168, 'MTABC_Q67')
+    from operator import attrgetter
+    q39_fixtures = bus_times(503991, dump_json=True)
+    q67_fixtures = bus_times(505168, 'MTABC_Q67')
+    fixtures = sorted(q39_fixtures + q67_fixtures, key=attrgetter('estimated_wait_time'))
     print_bus_times(fixtures)

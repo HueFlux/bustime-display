@@ -1,4 +1,6 @@
 import tkinter as tk
+import main as bustime
+from operator import attrgetter
 
 class BusTimeApp:
     def __init__(self, master):
@@ -16,15 +18,50 @@ class BusTimeApp:
         self.canvas = tk.Canvas(self.master, width=self.WIDTH, height=self.HEIGHT, bg=self.background_color)
         self.canvas.pack()
 
-        self.top_frame = tk.Frame(self.master, bd=5, bg=self.background_color)
-        self.top_frame.place(relx=0, rely=0, relwidth=1, relheight=0.5)
-
-        self.top_bus_widget = self.BusTimeWidget(self.top_frame, 'Q39', 'LI CITY QUEENS PLZ', 15)
+        self.upper_frame = tk.Frame(self.master, bd=5, bg=self.background_color)
+        self.upper_frame.place(relx=0, rely=0, relwidth=1, relheight=0.5)
 
         self.lower_frame = tk.Frame(self.master, bd=5, bg=self.background_color)
         self.lower_frame.place(relx=0, rely=0.5, relwidth=1, relheight=0.5)
 
-        self.lower_bus_widget = self.BusTimeWidget(self.lower_frame, 'Q67', 'LI CITY QUEENS PLZ', 1)
+        self.fixtures = []
+        self.lower_bus_time = 1 # Index of bus time displayed in lower_frame
+
+        self.display_bus_times()
+
+    def display_bus_times(self):
+        q39_fixtures = bustime.bus_times(503991, dump_json=True)
+        q67_fixtures = bustime.bus_times(505168, 'MTABC_Q67')
+
+        self.clear_bus_times()
+
+        self.fixtures = sorted(q39_fixtures + q67_fixtures,
+                               key=attrgetter('estimated_wait_time'))
+
+        if self.fixtures:
+            self.upper_bus_widget = self.BusTimeWidget(self.upper_frame,
+                self.fixtures[0].line_name,
+                self.fixtures[0].destination_name,
+                self.fixtures[0].estimated_wait_time)
+
+            if len(self.fixtures) > 1:
+                print(self.lower_bus_time)
+
+                self.lower_bus_widget = self.BusTimeWidget(self.lower_frame,
+                    self.fixtures[self.lower_bus_time].line_name,
+                    self.fixtures[self.lower_bus_time].destination_name,
+                    self.fixtures[self.lower_bus_time].estimated_wait_time)
+
+                # Cycle through bus times after the first
+                self.lower_bus_time = ((self.lower_bus_time) % (len(self.fixtures) - 1)) + 1
+
+        self.master.after(5000, self.display_bus_times)
+
+    def clear_bus_times(self):
+        for widget in self.upper_frame.winfo_children():
+            widget.destroy()
+        for widget in self.lower_frame.winfo_children():
+            widget.destroy()
 
     def toggle_fullscreen(self, event=None):
         self.is_fullscreen
