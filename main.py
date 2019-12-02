@@ -52,31 +52,26 @@ def extract_bus_times(stop_monitor_data):
     fixtures = [] # List to hold BusTimes
 
     for bus in stop_monitor_data['Siri']['ServiceDelivery']['StopMonitoringDelivery'][0]['MonitoredStopVisit']:
-        stops_from_call = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['StopsFromCall']
 
-        if stops_from_call > 25:
+        expected_arrival_time = bus['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedArrivalTime')
+
+        if not expected_arrival_time:
             continue
+
+        expected_arrival_time = datetime.fromisoformat(expected_arrival_time)
+        current_time = datetime.now(expected_arrival_time.tzinfo)
+        # Calculate wait time in minutes
+        estimated_wait_time = (expected_arrival_time - current_time).seconds // 60
+
+        stops_from_call = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['StopsFromCall']
 
         line_name = bus['MonitoredVehicleJourney']['PublishedLineName']
         destination_name = bus['MonitoredVehicleJourney']['DestinationName']
 
         presentable_distance = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['PresentableDistance']
 
-        expected_arrival_time = bus['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedArrivalTime')
-
-        if expected_arrival_time is not None:
-
-            expected_arrival_time = datetime.fromisoformat(expected_arrival_time)
-            current_time = datetime.now(expected_arrival_time.tzinfo)
-            # Calculate wait time in minutes
-            estimated_wait_time = (expected_arrival_time - current_time).seconds // 60
-            # Add BusTime to fixtures
-            fixtures.append(BusTime(line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance))
-
-        else:
-            continue
-            # Add BusTime to fixtures with None as estimated_wait_time
-            # fixtures.append(BusTime(line_name, destination_name, None, stops_from_call, presentable_distance))
+        # Add BusTime to fixtures
+        fixtures.append(BusTime(line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance))
 
     return fixtures
 
