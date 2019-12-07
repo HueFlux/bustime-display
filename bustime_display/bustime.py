@@ -2,12 +2,12 @@ import json
 import urllib.request
 import urllib.parse
 from datetime import datetime
-from os import getenv
+from os import environ
 from collections import namedtuple
 
-BusTime = namedtuple('BusTime', 'line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance')
+BusTime = namedtuple('BusTime', 'line_ref, line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance')
 
-BUSTIME_API_KEY = getenv('BUSTIME_API_KEY')
+BUSTIME_API_KEY = environ['BUSTIME_API_KEY']
 
 def stop_monitor_data(stop_id, line_ref=''):
     """
@@ -65,13 +65,15 @@ def extract_bus_times(stop_monitor_data):
 
         stops_from_call = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['StopsFromCall']
 
+        line_ref = bus['MonitoredVehicleJourney']['LineRef']
+
         line_name = bus['MonitoredVehicleJourney']['PublishedLineName']
         destination_name = bus['MonitoredVehicleJourney']['DestinationName']
 
         presentable_distance = bus['MonitoredVehicleJourney']['MonitoredCall']['Extensions']['Distances']['PresentableDistance']
 
         # Add BusTime to fixtures
-        fixtures.append(BusTime(line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance))
+        fixtures.append(BusTime(line_ref, line_name, destination_name, estimated_wait_time, stops_from_call, presentable_distance))
 
     return fixtures
 

@@ -1,8 +1,12 @@
 import tkinter as tk
 import bustime
 from operator import attrgetter
+from collections import namedtuple
 
 class BusTimeApp:
+
+    Notification = namedtuple('Notification', 'line_ref, wait_time')
+
     def __init__(self, master):
         self.master = master
         self.master.winfo_toplevel().title("Bus Time Display")
@@ -27,6 +31,8 @@ class BusTimeApp:
         self.fixtures = []
         self.lower_bus_time = 1 # Index of bus time displayed in lower_frame
 
+        self.notification = None
+
         self.display_bus_times()
 
     def display_bus_times(self):
@@ -39,7 +45,9 @@ class BusTimeApp:
                                key=attrgetter('estimated_wait_time'))
 
         if self.fixtures:
-            self.upper_bus_widget = self.BusTimeWidget(self.upper_frame,
+            self.upper_bus_widget = self.BusTimeWidget(self,
+                self.upper_frame,
+                self.fixtures[0].line_ref,
                 self.fixtures[0].line_name,
                 self.fixtures[0].destination_name,
                 self.fixtures[0].estimated_wait_time)
@@ -49,10 +57,12 @@ class BusTimeApp:
 
                 # Handle case where length of fixtures decreases
                 # below lower_bus_time
-                if self.lower_bus_widget >= len(fixtures):
-                    self.lower_bus_widget = len(fixtures) - 1
+                if self.lower_bus_time >= len(self.fixtures):
+                    self.lower_bus_time = len(self.fixtures) - 1
 
-                self.lower_bus_widget = self.BusTimeWidget(self.lower_frame,
+                self.lower_bus_widget = self.BusTimeWidget(self,
+                    self.lower_frame,
+                    self.fixtures[self.lower_bus_time].line_ref,
                     self.fixtures[self.lower_bus_time].line_name,
                     self.fixtures[self.lower_bus_time].destination_name,
                     self.fixtures[self.lower_bus_time].estimated_wait_time)
@@ -61,6 +71,21 @@ class BusTimeApp:
                 self.lower_bus_time = ((self.lower_bus_time) % (len(self.fixtures) - 1)) + 1
 
         self.master.after(5000, self.display_bus_times)
+
+    def set_notification(self, line_ref, wait_time=5):
+        self.notification = self.Notification(line_ref, wait_time)
+        print("Notification Set")
+        self.notify()
+
+    def notify(self):
+        for bus_time in self.fixtures:
+            if (self.notification.line_ref == bus_time.line_ref and
+                    self.notification.wait_time == bus_time.estimated_wait_time):
+                print(f"Send text: {bus_time.line_name} to {bus_time.destination_name} " \
+                      f"arriving in {bus_time.estimated_wait_time} min")
+                self.notification = None
+                return
+        self.master.after(5000, self.notify)
 
     def clear_bus_times(self):
         for widget in self.upper_frame.winfo_children():
@@ -75,8 +100,10 @@ class BusTimeApp:
         return "break"
 
     class BusTimeWidget:
-        def __init__(self, frame, line_name, destination_name, wait_time):
+        def __init__(self, bustime_app, frame, line_ref, line_name, destination_name, wait_time):
 
+            self.bustime_app = bustime_app
+            self.line_ref = line_ref
             self.line_name = line_name
             self.destination_name = destination_name
             self.wait_time = wait_time
@@ -91,7 +118,7 @@ class BusTimeApp:
             destination_label = tk.Button(self.frame_button, text=destination_name, font=('Roboto', 60, 'bold'), relief='flat')
             destination_label.place(relx=0.3, rely=0.25, relwidth=0.45, relheight=0.5)
 
-            wait_time_label = tk.Button(self.frame_button, text=f"{wait_time} min", font=('Roboto', 80, 'bold'), command=self.clear)
+            wait_time_label = tk.Button(self.frame_button, text=f"{wait_time} min", font=('Roboto', 80, 'bold'), command=lambda: self.bustime_app.set_notification(self.line_ref))
             wait_time_label.place(relx=0.775, rely=0.25, relwidth=0.20, relheight=0.5)
 
         def clear(self):
