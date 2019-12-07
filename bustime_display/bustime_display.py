@@ -7,7 +7,7 @@ from twilio.rest import Client
 
 class BusTimeApp:
 
-    Notification = namedtuple('Notification', 'line_ref, wait_time')
+    Notification = namedtuple('Notification', 'vehicle_ref, wait_time')
 
     def __init__(self, master):
         self.master = master
@@ -56,6 +56,7 @@ class BusTimeApp:
         if self.fixtures:
             self.upper_bus_widget = self.BusTimeWidget(self,
                 self.upper_frame,
+                self.fixtures[0].vehicle_ref,
                 self.fixtures[0].line_ref,
                 self.fixtures[0].line_name,
                 self.fixtures[0].destination_name,
@@ -71,6 +72,7 @@ class BusTimeApp:
 
                 self.lower_bus_widget = self.BusTimeWidget(self,
                     self.lower_frame,
+                    self.fixtures[self.lower_bus_time].vehicle_ref,
                     self.fixtures[self.lower_bus_time].line_ref,
                     self.fixtures[self.lower_bus_time].line_name,
                     self.fixtures[self.lower_bus_time].destination_name,
@@ -81,28 +83,30 @@ class BusTimeApp:
 
         self.master.after(5000, self.display_bus_times)
 
-    def set_notification(self, line_ref, wait_time=4):
-        self.notification = self.Notification(line_ref, wait_time)
+    def set_notification(self, vehicle_ref, wait_time=5):
+        self.notification = self.Notification(vehicle_ref, wait_time)
         print("Notification Set")
         self.notify()
 
     def notify(self):
         for bus_time in self.fixtures:
-            if (self.notification.line_ref == bus_time.line_ref and
-                    self.notification.wait_time == bus_time.estimated_wait_time):
+            if (self.notification.vehicle_ref == bus_time.vehicle_ref and
+                    self.notification.wait_time >= bus_time.estimated_wait_time):
 
                 message_text = f"{bus_time.line_name} to {bus_time.destination_name} " \
                                f"arriving in {bus_time.estimated_wait_time} min."
 
                 message = self.client.messages \
-                                .create(
-                                     body=message_text,
-                                     from_=self.twilio_phone,
-                                     to=self.phone_number
-                                 )
+                              .create(
+                                   body=message_text,
+                                   from_=self.twilio_phone,
+                                   to=self.phone_number
+                               )
                 print("SMS sent.")
+
                 self.notification = None
                 return
+
         self.master.after(5000, self.notify)
 
     def clear_bus_times(self):
@@ -118,25 +122,26 @@ class BusTimeApp:
         return "break"
 
     class BusTimeWidget:
-        def __init__(self, bustime_app, frame, line_ref, line_name, destination_name, wait_time):
+        def __init__(self, bustime_app, frame, vehicle_ref, line_ref, line_name, destination_name, wait_time):
 
             self.bustime_app = bustime_app
+            self.vehicle_ref = vehicle_ref
             self.line_ref = line_ref
             self.line_name = line_name
             self.destination_name = destination_name
             self.wait_time = wait_time
 
             self.frame = frame
-            self.frame_button = tk.Button(self.frame, command=lambda: print("Button Pressed"))
+            self.frame_button = tk.Button(self.frame, command=lambda: self.bustime_app.set_notification(self.line_ref))
             self.frame_button.place(relwidth=1, relheight=1)
 
-            bus_line_label = tk.Button(self.frame_button, text=line_name, font=('Roboto', 150, 'bold'), bg='#4d94ff')
+            bus_line_label = tk.Button(self.frame_button, text=line_name, font=('Roboto', 150, 'bold'), command=lambda: self.bustime_app.set_notification(self.vehicle_ref))
             bus_line_label.place(relx=0.025, rely=0.25, relwidth=0.25, relheight=0.5)
 
-            destination_label = tk.Button(self.frame_button, text=destination_name, font=('Roboto', 60, 'bold'), relief='flat')
+            destination_label = tk.Button(self.frame_button, text=destination_name, font=('Roboto', 60, 'bold'), command=lambda: self.bustime_app.set_notification(self.vehicle_ref))
             destination_label.place(relx=0.3, rely=0.25, relwidth=0.45, relheight=0.5)
 
-            wait_time_label = tk.Button(self.frame_button, text=f"{wait_time} min", font=('Roboto', 80, 'bold'), command=lambda: self.bustime_app.set_notification(self.line_ref))
+            wait_time_label = tk.Button(self.frame_button, text=f"{wait_time} min", font=('Roboto', 80, 'bold'), command=lambda: self.bustime_app.set_notification(self.vehicle_ref))
             wait_time_label.place(relx=0.775, rely=0.25, relwidth=0.20, relheight=0.5)
 
         def clear(self):
