@@ -2,6 +2,8 @@ import tkinter as tk
 import bustime
 from operator import attrgetter
 from collections import namedtuple
+from os import environ
+from twilio.rest import Client
 
 class BusTimeApp:
 
@@ -30,6 +32,13 @@ class BusTimeApp:
 
         self.fixtures = []
         self.lower_bus_time = 1 # Index of bus time displayed in lower_frame
+
+        self.account_sid = environ['TWILIO_ACCOUNT_SID']
+        self.auth_token = environ['TWILIO_AUTH_TOKEN']
+        self.client = Client(self.account_sid, self.auth_token)
+        self.twilio_phone = '+12055513213'
+
+        self.phone_number = environ['MY_PHONE_NUMBER']
 
         self.notification = None
 
@@ -72,7 +81,7 @@ class BusTimeApp:
 
         self.master.after(5000, self.display_bus_times)
 
-    def set_notification(self, line_ref, wait_time=5):
+    def set_notification(self, line_ref, wait_time=4):
         self.notification = self.Notification(line_ref, wait_time)
         print("Notification Set")
         self.notify()
@@ -81,8 +90,17 @@ class BusTimeApp:
         for bus_time in self.fixtures:
             if (self.notification.line_ref == bus_time.line_ref and
                     self.notification.wait_time == bus_time.estimated_wait_time):
-                print(f"Send text: {bus_time.line_name} to {bus_time.destination_name} " \
-                      f"arriving in {bus_time.estimated_wait_time} min")
+
+                message_text = f"{bus_time.line_name} to {bus_time.destination_name} " \
+                               f"arriving in {bus_time.estimated_wait_time} min."
+
+                message = self.client.messages \
+                                .create(
+                                     body=message_text,
+                                     from_=self.twilio_phone,
+                                     to=self.phone_number
+                                 )
+                print("SMS sent.")
                 self.notification = None
                 return
         self.master.after(5000, self.notify)
