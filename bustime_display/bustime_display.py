@@ -54,13 +54,8 @@ class BusTimeApp:
                                key=attrgetter('estimated_wait_time'))
 
         if self.fixtures:
-            self.upper_bus_widget = self.BusTimeWidget(self,
-                self.upper_frame,
-                self.fixtures[0].vehicle_ref,
-                self.fixtures[0].line_ref,
-                self.fixtures[0].line_name,
-                self.fixtures[0].destination_name,
-                self.fixtures[0].estimated_wait_time)
+            self.upper_bus_widget = self.BusTimeWidget(self, self.upper_frame,
+                                                       self.fixtures[0], 1)
 
             if len(self.fixtures) > 1:
                 print(self.lower_bus_time)
@@ -71,12 +66,9 @@ class BusTimeApp:
                     self.lower_bus_time = len(self.fixtures) - 1
 
                 self.lower_bus_widget = self.BusTimeWidget(self,
-                    self.lower_frame,
-                    self.fixtures[self.lower_bus_time].vehicle_ref,
-                    self.fixtures[self.lower_bus_time].line_ref,
-                    self.fixtures[self.lower_bus_time].line_name,
-                    self.fixtures[self.lower_bus_time].destination_name,
-                    self.fixtures[self.lower_bus_time].estimated_wait_time)
+                                             self.lower_frame,
+                                             self.fixtures[self.lower_bus_time],
+                                             self.lower_bus_time + 1)
 
                 # Cycle through bus times after the first
                 self.lower_bus_time = ((self.lower_bus_time) % (len(self.fixtures) - 1)) + 1
@@ -122,26 +114,26 @@ class BusTimeApp:
         return "break"
 
     class BusTimeWidget:
-        def __init__(self, bustime_app, frame, vehicle_ref, line_ref, line_name, destination_name, wait_time):
+        def __init__(self, bustime_app, frame, bus_time, position):
 
             self.bustime_app = bustime_app
-            self.vehicle_ref = vehicle_ref
-            self.line_ref = line_ref
-            self.line_name = line_name
-            self.destination_name = destination_name
-            self.wait_time = wait_time
-
             self.frame = frame
-            self.frame_button = tk.Button(self.frame, command=lambda: self.bustime_app.set_notification(self.line_ref))
+            self.bus_time = bus_time # BusTime namedtuple
+            self.position = position
+
+            self.frame_button = tk.Button(self.frame, command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             self.frame_button.place(relwidth=1, relheight=1)
 
-            bus_line_label = tk.Button(self.frame_button, text=line_name, font=('Roboto', 150, 'bold'), command=lambda: self.bustime_app.set_notification(self.vehicle_ref))
+            position_label = tk.Button(self.frame_button, text=f"{self.position}.", font=('Roboto', 60, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
+            position_label.place(relx=0.025, rely=0.025, relwidth=0.05, relheight=0.2)
+
+            bus_line_label = tk.Button(self.frame_button, text=self.bus_time.line_name, font=('Roboto', 150, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             bus_line_label.place(relx=0.025, rely=0.25, relwidth=0.25, relheight=0.5)
 
-            destination_label = tk.Button(self.frame_button, text=destination_name, font=('Roboto', 60, 'bold'), command=lambda: self.bustime_app.set_notification(self.vehicle_ref))
+            destination_label = tk.Button(self.frame_button, text=self.bus_time.destination_name, font=('Roboto', 60, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             destination_label.place(relx=0.3, rely=0.25, relwidth=0.45, relheight=0.5)
 
-            wait_time_label = tk.Button(self.frame_button, text=f"{wait_time} min", font=('Roboto', 80, 'bold'), command=lambda: self.bustime_app.set_notification(self.vehicle_ref))
+            wait_time_label = tk.Button(self.frame_button, text=f"{self.bus_time.estimated_wait_time} min", font=('Roboto', 80, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             wait_time_label.place(relx=0.775, rely=0.25, relwidth=0.20, relheight=0.5)
 
         def clear(self):
