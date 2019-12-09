@@ -14,7 +14,7 @@ class BusTimeApp:
         self.master.winfo_toplevel().title("Bus Time Display")
 
         self.is_fullscreen = False
-        self.master.bind('<Command-f>', self.toggle_fullscreen)
+        self.master.bind('<Control-f>', self.toggle_fullscreen)
 
         self.WIDTH = root.winfo_screenwidth()
         self.HEIGHT = root.winfo_screenheight()
@@ -77,7 +77,7 @@ class BusTimeApp:
 
     def set_notification(self, vehicle_ref, wait_time=5):
         self.notification = self.Notification(vehicle_ref, wait_time)
-        print("Notification Set")
+        print("Notification set.")
         self.notify()
 
     def notify(self):
@@ -121,19 +121,19 @@ class BusTimeApp:
             self.bus_time = bus_time # BusTime namedtuple
             self.position = position
 
-            self.frame_button = tk.Button(self.frame, command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
+            self.frame_button = tk.Button(self.frame, bg='white', relief='flat', command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             self.frame_button.place(relwidth=1, relheight=1)
 
-            position_label = tk.Button(self.frame_button, text=f"{self.position}.", font=('Roboto', 60, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
+            position_label = tk.Button(self.frame_button, text=f"{self.position}.", font=('Roboto', 60, 'bold'), bg='white', relief='flat', command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             position_label.place(relx=0.025, rely=0.025, relwidth=0.05, relheight=0.2)
 
-            bus_line_label = tk.Button(self.frame_button, text=self.bus_time.line_name, font=('Roboto', 150, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
+            bus_line_label = tk.Button(self.frame_button, text=self.bus_time.line_name, font=('Roboto', 140, 'bold'), bg='white', relief='flat', command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             bus_line_label.place(relx=0.025, rely=0.25, relwidth=0.25, relheight=0.5)
 
-            destination_label = tk.Button(self.frame_button, text=self.bus_time.destination_name, font=('Roboto', 60, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
+            destination_label = tk.Button(self.frame_button, text=self.bus_time.destination_name, font=('Roboto', 50, 'bold'), bg='white', relief='flat', command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             destination_label.place(relx=0.3, rely=0.25, relwidth=0.45, relheight=0.5)
 
-            wait_time_label = tk.Button(self.frame_button, text=f"{self.bus_time.estimated_wait_time} min", font=('Roboto', 80, 'bold'), command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
+            wait_time_label = tk.Button(self.frame_button, text=f"{self.bus_time.estimated_wait_time} min", font=('Roboto', 75, 'bold'), bg='white', relief='flat', command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             wait_time_label.place(relx=0.775, rely=0.25, relwidth=0.20, relheight=0.5)
 
         def clear(self):
