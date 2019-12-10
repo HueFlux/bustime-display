@@ -48,10 +48,10 @@ class BusTimeApp:
         q39_fixtures = bustime.bus_times(503991, dump_json=True)
         q67_fixtures = bustime.bus_times(505168, 'MTABC_Q67')
 
-        self.clear_bus_times()
-
         self.fixtures = sorted(q39_fixtures + q67_fixtures,
                                key=attrgetter('estimated_wait_time'))
+
+        self.clear_bus_times()
 
         if self.fixtures:
             self.upper_bus_widget = self.BusTimeWidget(self, self.upper_frame,
