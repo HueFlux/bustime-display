@@ -34,7 +34,7 @@ class BusTimeApp:
         self.lower_frame.place(relx=0, rely=0.5, relwidth=1, relheight=0.5)
 
         self.fixtures = [] # List to hold BusTime namedtuples
-        self.lower_bus_time = 1 # Index of BusTime displayed in lower_frame
+        self.lower_bus_time = 0 # Index of BusTime displayed in lower_frame
 
         # Get Twilio account credentials and phone number from local environment
         self.account_sid = environ['TWILIO_ACCOUNT_SID']
@@ -60,20 +60,15 @@ class BusTimeApp:
                                                        self.fixtures[0], 1)
 
             if len(self.fixtures) > 1:
-                print(self.lower_bus_time)
+                # Cycle through bus times after the first
+                self.lower_bus_time = ((self.lower_bus_time) % (len(self.fixtures) - 1)) + 1
 
-                # Handle case where length of fixtures decreases
-                # below lower_bus_time
-                if self.lower_bus_time >= len(self.fixtures):
-                    self.lower_bus_time = len(self.fixtures) - 1
+                # print(self.lower_bus_time)
 
                 self.lower_bus_widget = self.BusTimeWidget(self,
                                              self.lower_frame,
                                              self.fixtures[self.lower_bus_time],
                                              self.lower_bus_time + 1)
-
-                # Cycle through bus times after the first
-                self.lower_bus_time = ((self.lower_bus_time) % (len(self.fixtures) - 1)) + 1
 
         self.master.after(5000, self.display_bus_times)
 
@@ -149,8 +144,14 @@ class BusTimeApp:
             self.bus_time = bus_time # BusTime namedtuple
             self.position = position
 
+            background_color = 'white'
+            text_color = 'black'
+
+            if bus_time.presentable_distance == "approaching":
+                text_color = 'blue'
+
             self.frame_button = tk.Button(self.frame,
-                                bg='white',
+                                bg=background_color,
                                 relief='flat',
                                 command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             self.frame_button.place(relwidth=1, relheight=1)
@@ -158,7 +159,8 @@ class BusTimeApp:
             position_label = tk.Button(self.frame_button,
                              text=f"{self.position}.",
                              font=('Roboto', 60, 'bold'),
-                             bg='white',
+                             bg=background_color,
+                             fg=text_color,
                              relief='flat',
                              command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             position_label.place(relx=0.025, rely=0.025, relwidth=0.05, relheight=0.2)
@@ -166,7 +168,8 @@ class BusTimeApp:
             bus_line_label = tk.Button(self.frame_button,
                              text=self.bus_time.line_name,
                              font=('Roboto', 140, 'bold'),
-                             bg='white',
+                             bg=background_color,
+                             fg=text_color,
                              relief='flat',
                              command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             bus_line_label.place(relx=0.025, rely=0.25, relwidth=0.25, relheight=0.5)
@@ -174,7 +177,8 @@ class BusTimeApp:
             destination_label = tk.Button(self.frame_button,
                                 text=self.bus_time.destination_name,
                                 font=('Roboto', 50, 'bold'),
-                                bg='white',
+                                bg=background_color,
+                                fg=text_color,
                                 relief='flat',
                                 command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             destination_label.place(relx=0.3, rely=0.25, relwidth=0.45, relheight=0.5)
@@ -182,7 +186,8 @@ class BusTimeApp:
             wait_time_label = tk.Button(self.frame_button,
                               text=f"{self.bus_time.estimated_wait_time} min",
                               font=('Roboto', 75, 'bold'),
-                              bg='white',
+                              bg=background_color,
+                              fg=text_color,
                               relief='flat',
                               command=lambda: self.bustime_app.set_notification(self.bus_time.vehicle_ref))
             wait_time_label.place(relx=0.775, rely=0.25, relwidth=0.20, relheight=0.5)
