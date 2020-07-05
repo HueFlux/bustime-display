@@ -148,7 +148,9 @@ class BusTimeApp:
             text_color = 'black'
 
             if bus_time.presentable_distance == "approaching":
-                text_color = 'blue'
+                text_color = 'SlateBlue3'
+            elif bus_time.presentable_distance == "at stop":
+                text_color = 'orange red'
 
             self.frame_button = tk.Button(self.frame,
                                 bg=background_color,
